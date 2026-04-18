@@ -10,6 +10,11 @@
       that:
         - gnome_software_user != None
 
+  # make sure user exists
+  - name: Check if user exists {{ gnome_software_user }}
+    command: "getent passwd {{ gnome_software_user }}"
+    changed_when: false
+
   # gnome_software_updates == false
   - when: gnome_software_updates == false
     become: true
