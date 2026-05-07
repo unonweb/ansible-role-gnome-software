@@ -1,4 +1,5 @@
 ---
+gnome_software_apt_state: present
 gnome_software_user:
 gnome_software_auto_start: false
 gnome_software_updates: false

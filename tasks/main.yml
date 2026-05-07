@@ -4,65 +4,11 @@
     - gnome-software
   block:
 
-  # checks
-  - name: Check vars for gnome-software
-    ansible.builtin.assert:
-      that:
-        - gnome_software_user != None
-
-  # gnome_software_updates == false
-  - when: gnome_software_updates == false
+  - name: Apt state -> {{ gnome_software_apt_state }}
     become: true
-    become_user: "{{ gnome_software_user }}"
-    block:
+    ansible.builtin.apt:
+      name: gnome-software
+      state: "{{ gnome_software_apt_state }}"
 
-    - name: Set /org/gnome/software/allow-updates to false
-      community.general.dconf:
-        key: "/org/gnome/software/allow-updates"
-        value: "false"
-
-    - name: Set /org/gnome/software/download-updates to false
-      community.general.dconf:
-        key: "/org/gnome/software/download-updates"
-        value: "false"
-
-  # gnome_software_updates == true
-  - when: gnome_software_updates == true
-    become: true
-    become_user: "{{ gnome_software_user }}"
-    block:
-    
-    - name: Set /org/gnome/software/allow-updates to true
-      community.general.dconf:
-        key: "/org/gnome/software/allow-updates"
-        value: "true"
-
-    - name: Set /org/gnome/software/download-updates to true
-      community.general.dconf:
-        key: "/org/gnome/software/download-updates"
-        value: "true"
-
-  # auto_start == true
-  - when: gnome_software_auto_start == true
-    block:
-
-    # cp org.gnome.Software.desktop
-    - name: Copy gnome-software-autostart.desktop to /etc/xdg/autostart/org.gnome.Software.desktop
-      become: true
-      ansible.builtin.copy:
-        src: gnome-software-autostart.desktop
-        dest: /etc/xdg/autostart/org.gnome.Software.desktop
-        owner: root
-        group: root
-        mode: u=rw,g=r,o=r
-
-  # auto_start == false
-  - when: gnome_software_auto_start == false
-    block:
-
-    # rm org.gnome.Software.desktop
-    - name: Remove /etc/xdg/autostart/org.gnome.Software.desktop
-      become: true
-      ansible.builtin.file:
-        path: /etc/xdg/autostart/org.gnome.Software.desktop
-        state: absent
+  - when: gnome_software_apt_state != "absent"
+    ansible.builtin.import_tasks: state_present.yml
