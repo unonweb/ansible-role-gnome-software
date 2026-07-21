@@ -1,3 +1,4 @@
+---
 # checks
 - name: Check vars for gnome-software
   ansible.builtin.assert:
